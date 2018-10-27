@@ -1,34 +1,28 @@
 package tech.sabs.kafka.consumers
 
-import java.util.Properties
-import java.util
+import java.util.Collections
 
-import org.apache.kafka.clients.consumer.KafkaConsumer
+import tech.sabs.kafka.utils.KafkaUtilities
+
 import scala.collection.JavaConverters._
 
-object MySimpleConsumer extends App{
-  val TOPIC = "test"
+object MySimpleConsumer {
 
-  val props = new Properties()
+  def main(args: Array[String]): Unit = {
+    val TOPIC = "test"
 
-  val deserializer = "org.apache.kafka.common.serialization.StringDeserializer"
-  props.put("bootstrap.servers","localhost:9092")
+    val consumer = KafkaUtilities.createKafkaConsumer
 
-  props.put("key.deserializer", deserializer)
-  props.put("value.deserializer", deserializer)
-  props.put("group.id","something")
+    println("Start --- Consumer")
+    consumer.subscribe(Collections.singletonList(TOPIC))
 
-  val consumer = new KafkaConsumer[String, String](props)
-
-  println("Start --- Consumer")
-  consumer.subscribe(util.Collections.singletonList(TOPIC))
-
-  while(true){
-    val records = consumer.poll(100)
-    for(record <- records.asScala){
-      println(record)
+    while (true) {
+      val records = consumer.poll(100)
+      for (record <- records.asScala) {
+        println(record)
+      }
     }
-  }
 
-  println("End --- Consumer")
+    println("End --- Consumer")
+  }
 }

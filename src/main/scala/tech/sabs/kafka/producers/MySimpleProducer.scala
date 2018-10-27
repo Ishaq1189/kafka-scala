@@ -3,32 +3,27 @@ package tech.sabs.kafka.producers
 import java.util.Properties
 
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import tech.sabs.kafka.utils.KafkaUtilities
 
-object MySimpleProducer extends App {
+object MySimpleProducer {
 
-  val props = new Properties()
+  def main(args: Array[String]): Unit = {
+    val producer = KafkaUtilities.createKafkaProducer(args(0))
 
-  val serializer = "org.apache.kafka.common.serialization.StringSerializer"
+    val TOPIC = "test"
 
-  props.put("bootstrap.servers","localhost:9092")
-  props.put("key.serializer", serializer)
-  props.put("value.serializer", serializer)
+    println("Start --- Producer")
 
-  val producer = new KafkaProducer[String, String](props)
-  val TOPIC = "test"
+    for(i <-1 to 50){
+      val record = new ProducerRecord(TOPIC, "key", s"Hello $i")
+      producer.send(record)
+    }
 
-  println("Start --- Producer")
-
-  for(i <-1 to 50){
-    val record = new ProducerRecord(TOPIC, "key", s"Hello $i")
+    val record = new ProducerRecord(TOPIC, "key", "end of the record " + new java.util.Date)
     producer.send(record)
+
+    producer.close()
+
+    println("End --- Producer")
   }
-
-  val record = new ProducerRecord(TOPIC, "key", "end of the record " + new java.util.Date)
-  producer.send(record)
-
-  producer.close()
-
-  println("End --- Producer")
-
 }
